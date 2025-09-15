@@ -2,17 +2,13 @@ import pandas
 import numpy
 from sklearn.model_selection import train_test_split
 
-DATA_FILE = "data/price_0001.csv"
-
-def price2number(prices):
-    return numpy.array([float(str.replace(',', '')) for str in prices])
+DATA_FILE = "data/price_2330.csv"
 
 def preprocessing(n=20, test_size=0.2, val_size=0.1):
     df = pandas.read_csv(DATA_FILE)
-    df = df.sort_values(by="date").reset_index(drop=True)
+    df = df.sort_values(by="Date").reset_index(drop=True)
     
-    ohlc = df[["open", "high", "low", "close"]].values
-    ohlc = numpy.array([price2number(price) for price in ohlc])
+    ohlc = df[["Open", "High", "Low", "Close"]].values
     print(ohlc)
     
     X, y = [], []
