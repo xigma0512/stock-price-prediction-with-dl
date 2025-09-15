@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
-from data_preprocess import preprocessing
+from utils.data_preprocess import preprocessing
 
 X_train, y_train, X_val, y_val, X_test, y_test = preprocessing()
 
