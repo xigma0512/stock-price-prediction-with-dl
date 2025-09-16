@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
 from utils.data_preprocess import preprocessing
 
 X_train, y_train, X_val, y_val, X_test, y_test = preprocessing()
@@ -14,5 +14,7 @@ else:
 
 predictions = np.full(y_test.shape, most_frequent)
 accuracy = accuracy_score(y_test, predictions)
+mse = mean_squared_error(y_test, predictions)
 
-print(f'baseline model accuracy score: {accuracy}')
+print(f'baseline accuracy score: {accuracy}')
+print(f'baseline mean squared error: {mse}')
