@@ -15,8 +15,8 @@ def plot_graph(train_history):
     plt.ylabel('Loss')
 
     # accuracy
-    accuracy_values = history_dict['binary_accuracy']
-    val_accuracy_values = history_dict['val_binary_accuracy']
+    accuracy_values = history_dict['accuracy']
+    val_accuracy_values = history_dict['val_accuracy']
 
     plt.figure(2)
     plt.plot(epochs, accuracy_values, label='Training accuracy', color='blue', linestyle='-')
