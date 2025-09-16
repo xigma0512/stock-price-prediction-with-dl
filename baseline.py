@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, mean_squared_error
-from utils.data_preprocess import preprocessing
+from utils.preprocess import data_preprocessing
 
-X_train, y_train, X_val, y_val, X_test, y_test = preprocessing()
+X_train, y_train, X_val, y_val, X_test, y_test = data_preprocessing()
 
 n_zeros = np.sum(y_train == 0)
 n_ones = np.sum(y_train == 1)
