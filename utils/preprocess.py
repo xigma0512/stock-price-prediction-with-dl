@@ -15,16 +15,16 @@ def data_preprocessing(n=100, test_size=0.2, val_size=0.1):
     
     df['label'] = (df['Close'].shift(-1) > df['Open'].shift(-1)).astype(int)
     df = df.iloc[:-1]
-    features = ["Open", "High", "Low", "Close"]
-    ohlc = df[features].values
+    features_tags = ["Open", "High", "Low", "Close", "Volume"]
+    features = df[features_tags].values
     
     X, y = [], []
-    for i in range(len(ohlc) - n):
-        ohlc_group = ohlc[i:i+n]
-        group_flattened = ohlc_group.flatten()
+    for i in range(len(features) - n):
+        features_group = features[i:i+n]
+        group_flattened = features_group.flatten()
         scaler = MinMaxScaler(feature_range=(0, 1))
         normalized_group = scaler.fit_transform(group_flattened.reshape(-1, 1)).flatten()
-        X.append(normalized_group.reshape(n, 4))
+        X.append(normalized_group.reshape(n, 5))
         y.append(df['label'].iloc[i+n-1])
 
     X, y = np.array(X), np.array(y)

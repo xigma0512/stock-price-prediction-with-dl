@@ -81,13 +81,13 @@ def eval(model):
     avg_test_loss = test_loss / len(test_loader.dataset)
     test_accuracy = accuracy_score(y_true_test, y_pred_test)
 
-    print(f"✅ Test Accuracy: {test_accuracy:.4f}")
-    print(f"\nTest Loss: {avg_test_loss:.4f}")
+    print(f"\nTest Accuracy: {test_accuracy:.4f}")
+    print(f"Test Loss: {avg_test_loss:.4f}")
 
 if __name__ == "__main__":
 
     lstm_model = LSTMModel(
-        input_size=4,
+        input_size=5,
         hidden_size=100,
         num_layers=2,
         dropout_rate=0.2
