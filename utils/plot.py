@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+import time
 
 if not os.path.exists('results'):
     os.makedirs('results')
@@ -16,5 +17,5 @@ def plot_graph(name, train_values, val_values):
     plt.xlabel('Epochs')
     plt.legend()
     plt.grid(True)
-    plt.savefig(f'./results/{name}.png')
+    plt.savefig(f'./results/{name}_{time.time()}.png')
     plt.close()
