@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 
 from utils.preprocess import get_data_loaders
 from utils.plot import plot_graph
-from models.lstm import LSTM
+from models.lstm import LSTMModel
 
 train_loader, val_loader, test_loader = get_data_loaders(n=100, test_size=0.2, val_size=0.1, batch_size=64)
 
@@ -86,10 +86,10 @@ def eval(model):
 
 if __name__ == "__main__":
 
-    lstm_model = LSTM(
+    lstm_model = LSTMModel(
         input_size=4,
-        hidden_size=50,
-        num_layers=1,
+        hidden_size=100,
+        num_layers=2,
         dropout_rate=0.2
     )
     lstm_optimizer = optim.Adam(lstm_model.parameters(), lr=0.001)
