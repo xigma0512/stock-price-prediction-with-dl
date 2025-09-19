@@ -11,4 +11,19 @@
 ### 25/09/17
 - 將 Volume 加入至訓練集，觀察結果是否有改善。
     - 將 Volume 直接加到訓練集當中，發現模型的 acc 和 loss 在訓練過程中沒有波動(持平)，我猜測是當前的預處理模式不適合 Volume。
-    <center><img src="lstm/tryna_add_volume.png" width="1000"/></center>
+<center><img src="lstm/tryna_add_volume.png" width="1000"/></center>
+
+### 25/09/19
+- 我將 Volume 處理成 VWAP 均線，我認為這樣可以合理的方式把成交量這個變因加入訓練集。
+- 我更改了LSTM模型的層數和架構，但準確度在訓練過程中又維持不動了。我不確定是遇到學習瓶頸還是甚麼。
+    - 我將神經元的數量降到很低，而準確度又再次出現持平的問題，所以很明顯不是模型架構設計不當。
+- 我將原本的預測漲跌，改成預測隔一天的收盤價，我想嘗試不把結果限制在0或1來試試看。
+    - 訓練資料為2010年到現在的APPL價格
+    - 透過每 60 根K線的 OHLC 和 VWAP 共五項，預測下一根K線的 Close。
+    - 模型架構: LSTM(100)->LSTM(50)->Dropout(0.2)->Dense(1)，訓練 Epochs 1000次的結果：
+    - 訓練後期的數據: 
+        - Training Loss: 20~50, Training R2 > 0.9
+        - Validation Loss: 1000~2000, Validation R2: -1~-3
+        - Test Loss: 6404.5, Test R2: -11。
+        - 我認為可能是 overfitting
+<center><img src="lstm/loss_after_add_vwap.png" width="500"/>   <img src="lstm/r2_after_add_vwap.png" width="500"/></center>

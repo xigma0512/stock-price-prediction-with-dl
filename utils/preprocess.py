@@ -8,24 +8,33 @@ from torch.utils.data import TensorDataset, DataLoader
 
 DATA_FILE = "data/price_AAPL.csv"
 
-def data_preprocessing(n=100, test_size=0.2, val_size=0.1):
+def vwap(df):
+    typical_price = (df['High'] + df['Low'] + df['Close']) / 3
+    vwap_series = (typical_price * df['Volume'].cumsum()) / df['Volume'].cumsum()
+    return vwap_series
+
+def data_preprocessing(n, test_size, val_size):
     df = pd.read_csv(DATA_FILE)
     df = df.sort_values(by="Date").reset_index(drop=True)
     df = df.ffill()
     
-    df['label'] = (df['Close'].shift(-1) > df['Open'].shift(-1)).astype(int)
+    # labels = (df['Close'].shift(-1) > df['Open'].shift(-1)).astype(int)
+    labels = df['Close'].shift(-1)
     df = df.iloc[:-1]
-    features_tags = ["Open", "High", "Low", "Close", "Volume"]
+
+    df['VWAP'] = vwap(df)
+    features_tags = ["Open", "High", "Low", "Close", "VWAP"]
     features = df[features_tags].values
     
     X, y = [], []
     for i in range(len(features) - n):
         features_group = features[i:i+n]
-        group_flattened = features_group.flatten()
-        scaler = MinMaxScaler(feature_range=(0, 1))
-        normalized_group = scaler.fit_transform(group_flattened.reshape(-1, 1)).flatten()
-        X.append(normalized_group.reshape(n, 5))
-        y.append(df['label'].iloc[i+n-1])
+        # group_flattened = features_group.flatten()
+        # scaler = MinMaxScaler(feature_range=(0, 1))
+        # normalized_group = scaler.fit_transform(group_flattened.reshape(-1, 1)).flatten()
+        # X.append(normalized_group.reshape(n, 5))
+        X.append(features_group)
+        y.append(labels.iloc[i+n-1])
 
     X, y = np.array(X), np.array(y)
 
