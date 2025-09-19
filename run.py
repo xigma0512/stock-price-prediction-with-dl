@@ -86,12 +86,7 @@ def eval(model):
 
 if __name__ == "__main__":
 
-    lstm_model = LSTMModel(
-        input_size=5,
-        hidden_size=100,
-        num_layers=2,
-        dropout_rate=0.2
-    )
+    lstm_model = LSTMModel(input_size=5)
     lstm_optimizer = optim.Adam(lstm_model.parameters(), lr=0.001)
-    trained_lstm_model = train(lstm_model, lstm_optimizer, num_epochs = 200)
+    trained_lstm_model = train(lstm_model, lstm_optimizer, num_epochs = 100)
     eval(trained_lstm_model)
