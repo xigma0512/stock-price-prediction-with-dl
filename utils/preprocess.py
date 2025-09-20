@@ -11,8 +11,11 @@ DATA_FILE = "data/price_AAPL.csv"
 def vwap(df):
     v = df['Volume']
     typical_price = (df['Close'] + df['Low'] + df['High']).div(3).values
-    vwap_series = (typical_price * v).cumsum() / v.cumsum()
-    return vwap_series
+
+    v_cumsum = v.cumsum()
+    vwap_series = np.where(v_cumsum == 0, 0, (typical_price * v).cumsum() / v_cumsum)
+    
+    return pd.Series(vwap_series, index=df.index)
 
 def ema(df, span):
     return df['Close'].ewm(span=span, adjust=False).mean()
