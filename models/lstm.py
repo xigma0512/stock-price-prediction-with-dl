@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 class LSTMModel(nn.Module):
@@ -7,20 +6,20 @@ class LSTMModel(nn.Module):
 
         self.lstm_1 = nn.LSTM(
             input_size=input_size, 
-            hidden_size=100,
+            hidden_size=64,
             num_layers=1,
             batch_first=True
         )
 
         self.lstm_2 = nn.LSTM(
-            input_size=100, 
-            hidden_size=50, 
+            input_size=64, 
+            hidden_size=32, 
             num_layers=1,
             batch_first=True
         )
 
         self.dropout = nn.Dropout(0.2)
-        self.dense = nn.Linear(in_features=50, out_features=1)
+        self.dense = nn.Linear(in_features=32, out_features=1)
         
     def forward(self, x):
         lstm_out1, _ = self.lstm_1(x)

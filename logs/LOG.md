@@ -27,3 +27,8 @@
         - Test Loss: 6404.5, Test R2: -11。
         - 我認為可能是 overfitting
 <center><img src="lstm/loss_after_add_vwap.png" width="500"/>   <img src="lstm/r2_after_add_vwap.png" width="500"/></center>
+
+### 25/09/20
+- 我認為價格的 High 和 Low 會產生太多的噪音，所以我打算改為透過線形圖來訓練，也就是只考慮收盤價和成交量，希望可以增加 Close 和 Volume 的關聯性。
+- 成交量的特徵我透過 VWAP 來輸入，希望可以增強模型對 價格和成交量 關聯的理解。
+- 我嘗試將數據做規一化，但卻導致 Train MAPE 的數值變成天文數字，而 Train R2 和 Val R2 的值在訓練初期就直逼 0.95 以上。正在努力修...
