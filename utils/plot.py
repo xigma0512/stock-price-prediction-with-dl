@@ -17,7 +17,7 @@ def plot_train_result(name, train_values, val_values):
     plt.xlabel('Epochs')
     plt.legend()
     plt.grid(True)
-    plt.savefig(f'./results/{name}_{time.time()}.png')
+    plt.savefig(f'./results/{name}.png')
     plt.close()
 
 def plot_price_predictions(y_true, y_pred):
@@ -31,5 +31,5 @@ def plot_price_predictions(y_true, y_pred):
     plt.ylabel('Price')
     plt.legend()
     plt.grid(True)
-    plt.savefig(f'./results/predictions_{time.time()}.png')
+    plt.savefig(f'./results/predictions.png')
     plt.close()
