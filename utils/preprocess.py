@@ -9,8 +9,9 @@ from torch.utils.data import TensorDataset, DataLoader
 DATA_FILE = "data/price_AAPL.csv"
 
 def vwap(df):
-    typical_price = (df['High'] + df['Low'] + df['Close']) / 3
-    vwap_series = (typical_price * df['Volume'].cumsum()) / df['Volume'].cumsum()
+    v = df['Volume']
+    typical_price = (df['Close'] + df['Low'] + df['High']).div(3).values
+    vwap_series = (typical_price * v).cumsum() / v.cumsum()
     return vwap_series
 
 def data_preprocessing(n, test_size, val_size):
