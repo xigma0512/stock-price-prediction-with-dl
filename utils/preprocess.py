@@ -14,41 +14,47 @@ def vwap(df):
     vwap_series = (typical_price * v).cumsum() / v.cumsum()
     return vwap_series
 
+def ema(df, span):
+    return df['Close'].ewm(span=span, adjust=False).mean()
+
 def data_preprocessing(n, test_size, val_size):
     df = pd.read_csv(DATA_FILE)
     df = df.sort_values(by="Date").reset_index(drop=True)
     df = df.ffill()
     
-    df['VWAP'] = vwap(df)
-    df['Labels'] = df['Close'].shift(-1)
-    df = df.iloc[:-1]
+    span = 20; df['EMA'] = ema(df, span); df = df.iloc[span:]
+    df['Labels'] = df['Close'].shift(-1); df = df.iloc[:-1]
 
-    df['Close'] = np.log1p(df['Close'])
-    df['VWAP'] = np.log1p(df['VWAP'])
-    df['Labels'] = np.log1p(df['Labels'])
-
-    features_tags = ["Close", "VWAP"]
-    features = df[features_tags].values
-    
     X, y = [], []
-    for i in range(len(features) - n):
-        features_group = features[i:i+n]
-        X.append(features_group)
-        y.append(df['Labels'].iloc[i+n-1])
+    for i in range(len(df) - n):
+        sub_df = df.iloc[i : i + n].copy()
+
+        sub_df['VWAP'] = vwap(sub_df)
+        
+        sub_df['Close'] = np.log1p(sub_df['Close'])
+        sub_df['EMA'] = np.log1p(sub_df['EMA'])
+        sub_df['VWAP'] = np.log1p(sub_df['VWAP'])
+        sub_df['Labels'] = np.log1p(sub_df['Labels'])
+
+        features = sub_df[["Close", "EMA", "VWAP"]].values
+        output = sub_df['Labels'].iloc[-1]
+
+        X.append(features)
+        y.append(output)
 
     X, y = np.array(X), np.array(y)
 
     X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, shuffle=False)
     ratio = val_size / (1 - test_size)
-    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=ratio, shuffle=True)
+    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=ratio, shuffle=False)
     
-    scaler_X = MinMaxScaler(feature_range=(0, 10))
+    scaler_X = MinMaxScaler(feature_range=(0, 1))
     scaler_X.fit(X_train.reshape(-1, X_train.shape[-1]))
     X_train_scaled = scaler_X.transform(X_train.reshape(-1, X_train.shape[-1])).reshape(X_train.shape)
     X_val_scaled = scaler_X.transform(X_val.reshape(-1, X_val.shape[-1])).reshape(X_val.shape)
     X_test_scaled = scaler_X.transform(X_test.reshape(-1, X_test.shape[-1])).reshape(X_test.shape)
     
-    scaler_y = MinMaxScaler(feature_range=(0, 10))
+    scaler_y = MinMaxScaler(feature_range=(0.01, 1))
     scaler_y.fit(y_train.reshape(-1, 1))
     y_train_scaled = scaler_y.transform(y_train.reshape(-1, 1)).flatten()
     y_val_scaled = scaler_y.transform(y_val.reshape(-1, 1)).flatten()

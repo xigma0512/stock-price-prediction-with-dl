@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     train_loader, val_loader, test_loader, scaler = get_data_loaders(n=60, test_size=0.2, val_size=0.1, batch_size=20)
 
-    lstm_model = LSTMModel(input_size=2)
+    lstm_model = LSTMModel(input_size=3)
     lstm_optimizer = optim.Adam(lstm_model.parameters(), lr=0.001)
-    trained_lstm_model = train(lstm_model, lstm_optimizer, train_loader, val_loader, num_epochs=1000)
+    trained_lstm_model = train(lstm_model, lstm_optimizer, train_loader, val_loader, num_epochs=200)
     eval(trained_lstm_model, test_loader, scaler)
