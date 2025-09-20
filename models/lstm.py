@@ -22,12 +22,10 @@ class LSTMModel(nn.Module):
         self.dense = nn.Linear(in_features=32, out_features=1)
         
     def forward(self, x):
-        lstm_out1, _ = self.lstm_1(x)
-        lstm_out2, _ = self.lstm_2(lstm_out1)
-        final_output = lstm_out2[:, -1, :]
-        dropout_out = self.dropout(final_output)
-        dense_out = self.dense(dropout_out)
-        # output = torch.sigmoid(dense_out)
-        output = dense_out
+        output, _ = self.lstm_1(x)
+        output, _ = self.lstm_2(output)
+        output = output[:, -1, :]
+        output = self.dropout(output)
+        output = self.dense(output)
 
         return output
