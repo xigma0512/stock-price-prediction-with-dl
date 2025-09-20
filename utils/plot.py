@@ -25,7 +25,7 @@ def plot_price_predictions(y_true, y_pred):
     plt.title("Price History")
     
     plt.plot(y_true, label='Price History', color='blue')
-    plt.plot(y_pred, label='Predictions', color='red', linestyle='--')
+    plt.plot(y_pred, label='Predictions', color='red')
     
     plt.xlabel('Time')
     plt.ylabel('Price')
