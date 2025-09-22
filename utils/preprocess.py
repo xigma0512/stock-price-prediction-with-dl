@@ -1,49 +1,32 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import RobustScaler
 
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-DATA_FILE = "data/price_AAPL.csv"
-
-def vwap(df):
-    v = df['Volume']
-    typical_price = (df['Close'] + df['Low'] + df['High']).div(3).values
-
-    v_cumsum = v.cumsum()
-    vwap_series = np.where(v_cumsum == 0, 0, (typical_price * v).cumsum() / v_cumsum)
-    
-    return pd.Series(vwap_series, index=df.index)
-
-def ema(df, span):
-    return df['Close'].ewm(span=span, adjust=False).mean()
+DATA_FILE = 'data/train_dataset.csv'
 
 def data_preprocessing(n, test_size, val_size):
-    df = pd.read_csv(DATA_FILE)
-    df = df.sort_values(by="Date").reset_index(drop=True)
-    df = df.ffill()
-    
-    span = 20; df['EMA'] = ema(df, span); df = df.iloc[span:]
-    df['Labels'] = df['Close'].shift(-1); df = df.iloc[:-1]
+    train_dataset = pd.read_csv(DATA_FILE)
+    tickers = train_dataset['Ticker'].unique().tolist()
 
     X, y = [], []
-    for i in range(len(df) - n):
-        sub_df = df.iloc[i : i + n].copy()
 
-        sub_df['VWAP'] = vwap(sub_df)
-        
-        sub_df['Close'] = np.log1p(sub_df['Close'])
-        sub_df['EMA'] = np.log1p(sub_df['EMA'])
-        sub_df['VWAP'] = np.log1p(sub_df['VWAP'])
-        sub_df['Labels'] = np.log1p(sub_df['Labels'])
+    for ticker_name in tickers:
+        df = train_dataset[train_dataset['Ticker'] == ticker_name]
+        df = df.sort_values(by="Date").reset_index(drop=True)
 
-        features = sub_df[["Close", "EMA", "VWAP"]].values
-        output = sub_df['Labels'].iloc[-1]
+        df['Labels'] = df['Close'].shift(-1)
+        df = df.iloc[:-1]
 
-        X.append(features)
-        y.append(output)
+        features = df[["Close", "High", "Low", "Volume"]].values
+        labels = df['Labels'].values
+
+        for i in range(len(df) - n):
+            X.append(features[i:i+n])
+            y.append(labels[i+n-1])
 
     X, y = np.array(X), np.array(y)
 
@@ -51,13 +34,13 @@ def data_preprocessing(n, test_size, val_size):
     ratio = val_size / (1 - test_size)
     X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=ratio, shuffle=False)
     
-    scaler_X = MinMaxScaler(feature_range=(0, 1))
+    scaler_X = RobustScaler()
     scaler_X.fit(X_train.reshape(-1, X_train.shape[-1]))
     X_train_scaled = scaler_X.transform(X_train.reshape(-1, X_train.shape[-1])).reshape(X_train.shape)
     X_val_scaled = scaler_X.transform(X_val.reshape(-1, X_val.shape[-1])).reshape(X_val.shape)
     X_test_scaled = scaler_X.transform(X_test.reshape(-1, X_test.shape[-1])).reshape(X_test.shape)
     
-    scaler_y = MinMaxScaler(feature_range=(0.01, 1))
+    scaler_y = RobustScaler()
     scaler_y.fit(y_train.reshape(-1, 1))
     y_train_scaled = scaler_y.transform(y_train.reshape(-1, 1)).flatten()
     y_val_scaled = scaler_y.transform(y_val.reshape(-1, 1)).flatten()

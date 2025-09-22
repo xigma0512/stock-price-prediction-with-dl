@@ -10,7 +10,7 @@ from models.lstm import LSTMModel
 
 import signal
 
-def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
+def train(model, optimizer, train_loader, val_loader, scaler_y, num_epochs = 100):
     train_losses, val_losses = [], []
     train_r2, val_r2 = [], []
     train_mape, val_mape = [], []
@@ -34,8 +34,11 @@ def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
 
             running_loss += loss.item() * inputs.size(0)
 
-            y_true_train.extend(labels.flatten().tolist())
-            y_pred_train.extend(outputs.flatten().tolist())
+            y_true_train_orig = scaler_y.inverse_transform(labels.detach().cpu().numpy())
+            y_pred_train_orig = scaler_y.inverse_transform(outputs.detach().cpu().numpy())
+            
+            y_true_train.extend(y_true_train_orig.flatten().tolist())
+            y_pred_train.extend(y_pred_train_orig.flatten().tolist())
 
         avg_train_loss = running_loss / len(train_loader.dataset)
         train_r2_score = r2_score(y_true_train, y_pred_train)
@@ -49,9 +52,12 @@ def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
                 outputs = model(inputs)
                 loss = nn.MSELoss()(outputs, labels)
                 val_loss += loss.item() * inputs.size(0)
+    
+                y_true_val_orig = scaler_y.inverse_transform(labels.detach().cpu().numpy())
+                y_pred_val_orig = scaler_y.inverse_transform(outputs.detach().cpu().numpy())
                 
-                y_true_val.extend(labels.flatten().tolist())
-                y_pred_val.extend(outputs.flatten().tolist())
+                y_true_val.extend(y_true_val_orig.flatten().tolist())
+                y_pred_val.extend(y_pred_val_orig.flatten().tolist())
 
         avg_val_loss = val_loss / len(val_loader.dataset)
         val_r2_score = r2_score(y_true_val, y_pred_val)
@@ -95,9 +101,6 @@ def eval(model, test_loader, scaler):
     y_true_test_orig = scaler.inverse_transform(np.array(y_true_test).reshape(-1, 1))
     y_pred_test_orig = scaler.inverse_transform(np.array(y_pred_test).reshape(-1, 1))
 
-    y_true_test_orig = np.expm1(y_true_test_orig)
-    y_pred_test_orig = np.expm1(y_pred_test_orig)
-
     r2 = r2_score(y_true_test_orig, y_pred_test_orig)
     mape = mean_absolute_percentage_error(y_true_test_orig, y_pred_test_orig) * 100
     avg_test_loss = test_loss / len(test_loader.dataset)
@@ -119,9 +122,16 @@ def interrupt_handler(sig, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, interrupt_handler)
 
-    train_loader, val_loader, test_loader, scaler = get_data_loaders(n=60, test_size=0.2, val_size=0.1, batch_size=20)
+    train_loader, val_loader, test_loader, scaler = get_data_loaders(
+        n=60,
+        test_size=0.2,
+        val_size=0.1,
+        batch_size=20
+    )
 
-    lstm_model = LSTMModel(input_size=3)
-    lstm_optimizer = optim.Adam(lstm_model.parameters(), lr=0.001)
-    trained_lstm_model = train(lstm_model, lstm_optimizer, train_loader, val_loader, num_epochs=200)
+    lstm_model = LSTMModel(input_size=4)
+    lstm_optimizer = optim.AdamW(lstm_model.parameters(), lr=0.001)
+
+    trained_lstm_model = train(lstm_model, lstm_optimizer, train_loader, val_loader, scaler, num_epochs=300)
+    
     eval(trained_lstm_model, test_loader, scaler)
