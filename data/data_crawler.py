@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -12,6 +13,8 @@ stocks = [
 stocks_df = []
 for name in stocks:
     df = yf.Ticker(name).history(period="max", interval="1d", start='2015-01-01')
+    for col in ['Close', 'High', 'Low', 'Open']:
+        df[col] = np.floor(df[col] * 100) / 100
     df["Ticker"] = name
     df = df.ffill()
     stocks_df.append(df)
