@@ -7,21 +7,21 @@ class LSTMModel(nn.Module):
 
         self.lstm_1 = nn.LSTM(
             input_size=input_size, 
-            hidden_size=128,
+            hidden_size=64,
             num_layers=1,
             batch_first=True
         )
 
         self.lstm_2 = nn.LSTM(
-            input_size=128, 
-            hidden_size=64, 
+            input_size=64, 
+            hidden_size=32, 
             num_layers=1,
             batch_first=True
         )
 
         self.lstm_3 = nn.LSTM(
-            input_size=64, 
-            hidden_size=32, 
+            input_size=32, 
+            hidden_size=16, 
             num_layers=1,
             batch_first=True
         )
@@ -29,7 +29,7 @@ class LSTMModel(nn.Module):
         self.dropout_1 = nn.Dropout(0.2)
         self.dropout_2 = nn.Dropout(0.3)
         self.dropout_3 = nn.Dropout(0.3)
-        self.dense = nn.Linear(in_features=32, out_features=1)
+        self.dense = nn.Linear(in_features=16, out_features=1)
         
     def forward(self, x):
         output = x
