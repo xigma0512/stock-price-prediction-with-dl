@@ -84,6 +84,7 @@ def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
         print(f"{'R2':<10} | {train_r2_score:>10.4f} | {val_r2_score:>10.4f}")
         print(f"{'MAE':<10} | {train_mae_score:>10.2f} | {val_mae_score:>10.2f}")
         print(f"{'RMSE':<10} | {train_rmse_score:>10.2f} | {val_rmse_score:>10.2f}")
+        print(f"{'-----------':<10}-{'------------':>10}-{'------------':>10}")
 
     plot_train_result('Loss', train_losses, val_losses)
     plot_train_result('R-squared', train_r2, val_r2)
