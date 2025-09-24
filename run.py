@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.metrics import r2_score, mean_absolute_error, root_mean_squared_error
 
 from data.preprocess import test_data_preprocess, train_data_preprocess
 from utils.plot import plot_train_result, plot_price_predictions
@@ -44,7 +44,7 @@ def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
         avg_train_loss = running_loss / len(train_loader.dataset)
         train_r2_score = r2_score(y_true_train, y_pred_train)
         train_mae_score = mean_absolute_error(y_true_train, y_pred_train)
-        train_rmse_score = np.sqrt(mean_squared_error(y_true_train, y_pred_train))
+        train_rmse_score = np.sqrt(root_mean_squared_error(y_true_train, y_pred_train))
 
         model.eval()
         val_loss = 0.0
@@ -65,7 +65,7 @@ def train(model, optimizer, train_loader, val_loader, num_epochs = 100):
         avg_val_loss = val_loss / len(val_loader.dataset)
         val_r2_score = r2_score(y_true_val, y_pred_val)
         val_mae_score = mean_absolute_error(y_true_val, y_pred_val)
-        val_rmse_score = np.sqrt(mean_squared_error(y_true_val, y_pred_val))
+        val_rmse_score = np.sqrt(root_mean_squared_error(y_true_val, y_pred_val))
 
         train_losses.append(avg_train_loss)
         train_r2.append(train_r2_score)
@@ -112,7 +112,7 @@ def eval(model, test_loader, scaler_y):
 
     r2 = r2_score(y_true_test_orig, y_pred_test_orig)
     mae = mean_absolute_error(y_true_test_orig, y_pred_test_orig)
-    rmse = np.sqrt(mean_squared_error(y_true_test_orig, y_pred_test_orig))
+    rmse = np.sqrt(root_mean_squared_error(y_true_test_orig, y_pred_test_orig))
     avg_test_loss = test_loss / len(test_loader.dataset)
 
     print("Evaluation Result:")
